@@ -9,5 +9,9 @@ module.exports = {
       url: process.env.INFURA_GOERLI_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY],
     },
+    sepolia: {
+      url: process.env.INFURA_SEPOLIA_ENDPOINT,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
 };
