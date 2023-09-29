@@ -2,10 +2,6 @@
 
 Create an Aave Flash Loan arbitrage smart contract from scratch in this comprehensive flash loan tutorial by Block Explorer.
 
-## Project repo:
-
-https://github.com/jspruance/aave-flash-loan-tutorial
-
 ## Aave v3 Flash Loan documentation:
 
 https://docs.aave.com/developers/guides/flash-loans
@@ -31,6 +27,12 @@ import {ILendingPoolAddressesProvider} from "https://github.com/aave/protocol-v2
 import {IERC20} from "https://github.com/aave/protocol-v2/blob/master/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 ## Dex.sol deployed (Sepolia):
+
+0xC32F44158D950A4636C8485b101E53EE9f6E99dD
+
+## FlashLoanArbitrage.sol deployed (Sepolia):
+
+0xF5Ea9a57e135D85D41b8e20616D07c1E790A972a
 
 ## Add liquidity to Dex.sol:
 
