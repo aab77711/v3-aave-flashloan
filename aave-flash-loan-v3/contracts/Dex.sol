@@ -7,7 +7,7 @@ import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contract
 contract Dex {
     address payable public owner;
 
-    // Aave ERC20 Token addresses on Goerli network
+    // Aave ERC20 Token addresses on Sepolia network
     address private immutable daiAddress =
         0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
     address private immutable usdcAddress =
