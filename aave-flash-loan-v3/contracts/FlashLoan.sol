@@ -9,9 +9,9 @@ import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contract
 contract FlashLoan is FlashLoanSimpleReceiverBase {
     address payable owner;
 
-    constructor(address _addressProvider)
-        FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider))
-    {
+    constructor(
+        address _addressProvider
+    ) FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider)) {
         owner = payable(msg.sender);
     }
 

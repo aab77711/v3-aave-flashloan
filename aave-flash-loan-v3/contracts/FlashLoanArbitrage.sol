@@ -7,38 +7,35 @@ import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAd
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
 interface IDex {
-    function depositUSDC(uint256 _amount) external;
-
-    function depositDAI(uint256 _amount) external;
-
-    function buyDAI() external;
-
-    function sellDAI() external;
+    function simpleTrades() external;
 }
 
 contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
     address payable owner;
 
-    // Aave ERC20 Token addresses on Seplia network
-    address private immutable daiAddress =
-        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
-    address private immutable usdcAddress =
-        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
-    address private dexContractAddress =
-        0xC32F44158D950A4636C8485b101E53EE9f6E99dD;
+    // Aave ERC20 Token addresses
+    // address public daiAddress;
+    // address public daiAddress = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    // address public usdcAddress;
+    // address public usdcAddress = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address public dexContractAddress;
 
     IERC20 private dai;
     IERC20 private usdc;
     IDex private dexContract;
 
     constructor(
-        address _addressProvider
+        address _addressProvider,
+        address _dexContractAddress,
+        address _daiAddress,
+        address _usdcAddress
     ) FlashLoanSimpleReceiverBase(IPoolAddressesProvider(_addressProvider)) {
         owner = payable(msg.sender);
 
-        dai = IERC20(daiAddress);
-        usdc = IERC20(usdcAddress);
-        dexContract = IDex(dexContractAddress);
+        dai = IERC20(_daiAddress);
+        usdc = IERC20(_usdcAddress);
+        dexContractAddress = _dexContractAddress;
+        dexContract = IDex(_dexContractAddress);
     }
 
     /**
@@ -57,10 +54,7 @@ contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
         //
 
         // Arbirtage operation
-        dexContract.depositUSDC(amount);
-        dexContract.buyDAI();
-        dexContract.depositDAI(dai.balanceOf(address(this)));
-        dexContract.sellDAI();
+        dexContract.simpleTrades();
 
         // At the end of your logic above, this contract owes
         // the flashloaned amount + premiums.

@@ -4,58 +4,112 @@ pragma solidity 0.8.10;
 
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 
+interface IUniswapV2Router {
+    function swapExactTokensForTokens(
+        //amount of tokens we are sending in
+        uint256 amountIn,
+        //the minimum amount of tokens we want out of the trade
+        uint256 amountOutMin,
+        //list of token addresses we are going to trade in.  this is necessary to calculate amounts
+        address[] calldata path,
+        //this is the address we are going to send the output tokens to
+        address to,
+        //the last time that the trade is valid for
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
+}
+
 contract Dex {
     address payable public owner;
 
-    // Aave ERC20 Token addresses on Sepolia network
-    address private immutable daiAddress =
-        0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357;
-    address private immutable usdcAddress =
-        0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
+    // address private constant wethAddress =
+    //     0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    // address private constant daiAddress =
+    //     0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    // address private constant usdcAddress =
+    //     0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+
+    // address private constant UNISWAP_ROUTER_ADDRESS =
+    //     0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+
+    IUniswapV2Router public uniswapRouter;
 
     IERC20 private dai;
     IERC20 private usdc;
+    IERC20 private weth;
 
-    // exchange rate indexes
-    uint256 dexARate = 90;
-    uint256 dexBRate = 100;
-
-    // keeps track of individuals' dai balances
-    mapping(address => uint256) public daiBalances;
-
-    // keeps track of individuals' USDC balances
-    mapping(address => uint256) public usdcBalances;
-
-    constructor() {
+    constructor(address _uRouter, address _dai, address _usdc, address _weth) {
         owner = payable(msg.sender);
-        dai = IERC20(daiAddress);
-        usdc = IERC20(usdcAddress);
+
+        uniswapRouter = IUniswapV2Router(_uRouter);
+        dai = IERC20(_dai);
+        usdc = IERC20(_usdc);
+        weth = IERC20(_weth);
     }
 
-    function depositUSDC(uint256 _amount) external {
-        usdcBalances[msg.sender] += _amount;
-        uint256 allowance = usdc.allowance(msg.sender, address(this));
+    // Just buy DAI for USDC and resell it to pay back
+    // replace this logic to whatever you want
+    function simpleTrades(uint _amount) external {
+        // get the loan from flashloan contract
+        depositUSDC(msg.sender, _amount);
+        // buy other token
+        buyDAI(msg.sender);
+        // get purchased token
+        depositDAI(msg.sender, dai.balanceOf(msg.sender));
+        // sell it to pay back loan
+        sellDAI(msg.sender);
+    }
+
+    function depositUSDC(address _sender, uint256 _amount) public {
+        uint256 allowance = usdc.allowance(_sender, address(this));
         require(allowance >= _amount, "Check the token allowance");
-        usdc.transferFrom(msg.sender, address(this), _amount);
+        usdc.transferFrom(_sender, address(this), _amount);
     }
 
-    function depositDAI(uint256 _amount) external {
-        daiBalances[msg.sender] += _amount;
-        uint256 allowance = dai.allowance(msg.sender, address(this));
+    function depositDAI(address _sender, uint256 _amount) public {
+        uint256 allowance = dai.allowance(_sender, address(this));
         require(allowance >= _amount, "Check the token allowance");
-        dai.transferFrom(msg.sender, address(this), _amount);
+        dai.transferFrom(_sender, address(this), _amount);
     }
 
-    function buyDAI() external {
-        uint256 daiToReceive = ((usdcBalances[msg.sender] / dexARate) * 100) *
-            (10 ** 12);
-        dai.transfer(msg.sender, daiToReceive);
+    function buyDAI(address _recipient) public {
+        uint256 usdcBalances = usdc.balanceOf(address(this));
+
+        usdc.approve(address(uniswapRouter), usdcBalances);
+
+        address[] memory path;
+        path = new address[](2);
+        path[0] = address(usdc);
+        path[1] = address(weth);
+        path[2] = address(dai);
+
+        uniswapRouter.swapExactTokensForTokens(
+            usdcBalances,
+            1,
+            path,
+            _recipient,
+            block.timestamp
+        );
     }
 
-    function sellDAI() external {
-        uint256 usdcToReceive = ((daiBalances[msg.sender] * dexBRate) / 100) /
-            (10 ** 12);
-        usdc.transfer(msg.sender, usdcToReceive);
+    function sellDAI(address _recipient) public {
+        uint256 daiBalance = dai.balanceOf(address(this));
+
+        dai.approve(address(uniswapRouter), daiBalance);
+
+        address[] memory path;
+        path = new address[](2);
+        path[0] = address(dai);
+        path[1] = address(weth);
+        path[2] = address(usdc);
+
+        uniswapRouter.swapExactTokensForTokens(
+            daiBalance,
+            1,
+            path,
+            _recipient,
+            block.timestamp
+        );
     }
 
     function getBalance(address _tokenAddress) external view returns (uint256) {
