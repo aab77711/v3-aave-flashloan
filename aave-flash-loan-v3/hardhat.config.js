@@ -35,6 +35,10 @@ module.exports = {
       url: process.env.INFURA_SEPOLIA_ENDPOINT,
       accounts: [process.env.PRIVATE_KEY],
     },
+    mainnet: {
+      url: process.env.INFURA_MAINNET_ENDPOINT,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
   etherscan: {
     apiKey: {
