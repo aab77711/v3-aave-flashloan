@@ -33,18 +33,52 @@ contract Dex {
     //     0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
     IUniswapV2Router public uniswapRouter;
+    IUniswapV2Router public sushiswapRouter;
 
     IERC20 private dai;
     IERC20 private usdc;
     IERC20 private weth;
 
-    constructor(address _uRouter, address _dai, address _usdc, address _weth) {
+    constructor(
+        address _uRouter,
+        address _sRouter,
+        address _dai,
+        address _usdc,
+        address _weth
+    ) {
         owner = payable(msg.sender);
 
         uniswapRouter = IUniswapV2Router(_uRouter);
+        sushiswapRouter = IUniswapV2Router(_sRouter);
         dai = IERC20(_dai);
         usdc = IERC20(_usdc);
         weth = IERC20(_weth);
+    }
+
+    function setFirstRouter(address _router) external {
+        require(
+            _router != address(0),
+            "Router address must not be zero address"
+        );
+        uniswapRouter = IUniswapV2Router(_router);
+    }
+
+    function setSecondRouter(address _router) external {
+        require(
+            _router != address(0),
+            "Router address must not be zero address"
+        );
+        sushiswapRouter = IUniswapV2Router(_router);
+    }
+
+    function setQuoteToken(address _token) external {
+        require(_token != address(0), "Token must be balid");
+        dai = IERC20(_token);
+    }
+
+    function setBaseToken(address _token) external {
+        require(_token != address(0), "Token must be balid");
+        usdc = IERC20(_token);
     }
 
     // Just buy DAI for USDC and resell it to pay back

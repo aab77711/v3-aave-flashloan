@@ -38,6 +38,24 @@ contract FlashLoanArbitrage is FlashLoanSimpleReceiverBase {
         dexContract = IDex(_dexContractAddress);
     }
 
+    function setDexContract(address _contract) external {
+        require(
+            _contract != address(0),
+            "Router address must not be zero address"
+        );
+        dexContract = IDex(_contract);
+    }
+
+    function setQuoteToken(address _token) external {
+        require(_token != address(0), "Token must be balid");
+        dai = IERC20(_token);
+    }
+
+    function setBaseToken(address _token) external {
+        require(_token != address(0), "Token must be balid");
+        usdc = IERC20(_token);
+    }
+
     /**
         This function is called after your contract has received the flash loaned amount
      */
