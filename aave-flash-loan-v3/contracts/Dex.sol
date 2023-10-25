@@ -112,7 +112,7 @@ contract Dex {
         usdc.approve(address(uniswapRouter), usdcBalances);
 
         address[] memory path;
-        path = new address[](2);
+        path = new address[](3);
         path[0] = address(usdc);
         path[1] = address(weth);
         path[2] = address(dai);
@@ -132,7 +132,7 @@ contract Dex {
         dai.approve(address(uniswapRouter), daiBalance);
 
         address[] memory path;
-        path = new address[](2);
+        path = new address[](3);
         path[0] = address(dai);
         path[1] = address(weth);
         path[2] = address(usdc);
@@ -164,4 +164,6 @@ contract Dex {
     }
 
     receive() external payable {}
+
+    fallback() external payable {}
 }
