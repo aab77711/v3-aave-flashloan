@@ -1,3 +1,5 @@
+### An example of flashloan leveraging AAVE protocol.
+
 # Deployment
 
 **At first, ensure you are in `/aave-flash-loan-v3` directory**
@@ -49,3 +51,9 @@ This is general command to verify smart contract you just deployed
 ```shell
 npx hardhat verify --network mainnet <contract_address> <deploy_param_1> <deploy_param_2> <deploy_param_3> ...
 ```
+
+# Interact with Flashbots
+
+If you want to implement your flashloans bypass mempool securely, you're supposed to use Flashbots.
+
+Please refer this code, [here](https://github.com/versedpro/dex-order-execution)
