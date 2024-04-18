@@ -52,6 +52,23 @@ This is general command to verify smart contract you just deployed
 npx hardhat verify --network mainnet <contract_address> <deploy_param_1> <deploy_param_2> <deploy_param_3> ...
 ```
 
+# Order of execution
+
+### Add liquidity to Dex.sol:
+
+USDC 1500
+DAI 1500
+
+### Approve:
+
+USDC 1000000000
+DAI 1200000000000000000000
+
+### Request Loan - USDC (6 decimal):
+
+0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8,1000000000 // 1,000 USDC
+0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8,1000000 // 1 USDC
+
 # Interact with Flashbots
 
 If you want to implement your flashloans bypass mempool securely, you're supposed to use Flashbots.
